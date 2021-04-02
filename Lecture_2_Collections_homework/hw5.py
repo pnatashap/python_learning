@@ -28,12 +28,9 @@ from typing import Any, List, Sequence
 
 
 def custom_range(orig_seq: Sequence[Any], *args: Any) -> List[Any]:
-    seq = orig_seq
     start, stop, step = None, None, 1
-    start_index = 0
     if len(args) == 3:
         start, stop, step = args
-        start_index = -1
     elif len(args) == 2:
         if type(args[1]) is int:
             step = args[1]
@@ -41,27 +38,11 @@ def custom_range(orig_seq: Sequence[Any], *args: Any) -> List[Any]:
         else:
             stop = args[1]
             start = args[0]
-            start_index = -1
     elif len(args) == 1:
         stop = args[0]
     elif len(args) > 3:
         raise Exception("Invalid number of input parameters")
 
-    result = []
-    if step < 1:
-        seq = reversed(orig_seq)
+    slice_obj = slice(None if start is None else orig_seq.index(start), orig_seq.index(stop), step)
 
-    for i, o in enumerate(seq):
-        if start_index < 0:
-            if o == start:
-                start_index = i
-            else:
-                continue
-
-        if o == stop:
-            break
-
-        if (i - start_index) % step == 0:
-            result.append(o)
-
-    return result
+    return list(orig_seq[slice_obj])
