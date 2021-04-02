@@ -12,29 +12,9 @@ assert combinations([1, 2], [3, 4]) == [
 ]
 """
 from typing import Any, List
+from itertools import product
 
 
 def combinations(*args: List[Any]) -> List[List]:
-    k = len(args)
-    result = []
-    idx = [0 for i in range(k)]
-    has_next = True
-    while has_next:
-        result.append([args[x][idx[x]] for x in range(k)])
-        has_next = _shift_to_next(k-1, idx, args)
-
-    return result
-
-
-def _shift_to_next(position: int, idx: List[int], args: List[any]) -> bool:
-    next_position = idx[position] + 1
-    idx[position] = next_position
-    if len(args[position]) <= next_position:
-        next_position = 0
-        idx[position] = next_position
-        if position > 0:
-            return _shift_to_next(position-1, idx, args)
-        else:
-            return False
-
-    return True
+    res = [list(x) for x in product(*args)]
+    return res
