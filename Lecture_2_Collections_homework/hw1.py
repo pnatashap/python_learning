@@ -69,22 +69,17 @@ check_count = 1
 
 def check_data(filepath: str, validators: Iterable[Callable]) -> str:
     global check_count
-    with open(filepath) as file_under_test:
-        report_name = f"report_{check_count}.txt"
-        check_count = check_count + 1
+    report_name = f"report_{check_count}.txt"
+    check_count = check_count + 1
+    with open(filepath) as file_under_test, open(report_name, "w") as report_file:
+        for file_line in file_under_test:
+            file_line = file_line.strip()
 
-        with open(report_name, "w+") as report_file:
-            while True:
-                file_line = file_under_test.readline()
-                if not file_line:
+            # run validation
+            for validator in validators:
+                is_valid = validator(file_line)
+                if not is_valid:
+                    report_file.write(f"{file_line} {validator.__name__}\n")
                     break
-                file_line = file_line.strip()
-
-                # run validation
-                for validator in validators:
-                    is_valid = validator(file_line)
-                    if not is_valid:
-                        report_file.write(f"{file_line} {validator.__name__}\n")
-                        break
-            report_file.flush()
-        return os.path.abspath(report_name)
+        report_file.flush()
+    return os.path.abspath(report_name)

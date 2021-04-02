@@ -23,10 +23,7 @@ from typing import List, Tuple
 def major_and_minor_elem(inp: List) -> Tuple[int, int]:
     freq = dict()
     for i in inp:
-        new_val = 1
-        if i in freq:
-            new_val = freq[i] + 1
-        freq.update({i: new_val})
+        freq[i] = freq.get(i, 0) + 1
 
     sorted_freq = sorted(freq.items(), key=lambda kv: (kv[1], kv[0]))
 
