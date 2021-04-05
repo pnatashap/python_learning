@@ -24,3 +24,25 @@ assert = custom_range(string.ascii_lowercase, 'g', 'p') == ['g', 'h', 'i', 'j', 
 assert = custom_range(string.ascii_lowercase, 'p', 'g', -2) == ['p', 'n', 'l', 'j', 'h']
 
 """
+from typing import Any, List, Sequence
+
+
+def custom_range(orig_seq: Sequence[Any], *args: Any) -> List[Any]:
+    start, stop, step = None, None, 1
+    if len(args) == 3:
+        start, stop, step = args
+    elif len(args) == 2:
+        if type(args[1]) is int:
+            step = args[1]
+            stop = args[0]
+        else:
+            stop = args[1]
+            start = args[0]
+    elif len(args) == 1:
+        stop = args[0]
+    elif len(args) > 3:
+        raise Exception("Invalid number of input parameters")
+
+    slice_obj = slice(None if start is None else orig_seq.index(start), orig_seq.index(stop), step)
+
+    return list(orig_seq[slice_obj])

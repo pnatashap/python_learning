@@ -21,4 +21,10 @@ from typing import List, Tuple
 
 
 def major_and_minor_elem(inp: List) -> Tuple[int, int]:
-    ...
+    freq = dict()
+    for i in inp:
+        freq[i] = freq.get(i, 0) + 1
+
+    sorted_freq = sorted(freq.items(), key=lambda kv: (kv[1], kv[0]))
+
+    return sorted_freq[-1][0], sorted_freq[0][0]

@@ -28,16 +28,58 @@ output lines:
 foo@example.com 729.83 EUR accountName 2021-01:0 validate_date
 bar@example.com 729.83 accountName 2021-01-02 validate_line
 """
+import os
+import re
 from typing import Callable, Iterable
 
 
 def validate_line(line: str) -> bool:
-    ...
+    parts = line.split()
+    if len(parts) == 5:
+        return True
+    return False
 
 
 def validate_date(date: str) -> bool:
-    ...
+    parts = date.split()
+    date_pattern = re.compile(r'^\d{4}\-\d{2}-\d{2}$')
+    for p in parts:
+        if date_pattern.match(p):
+            return True
+    return False
+
+
+def validate_mail(date: str) -> bool:
+    parts = date.split()
+    return parts[0].find("@") > 1
+
+
+def validate_amount(date: str) -> bool:
+    parts = date.split()
+    return parts[1].match(r'\d+\.\d+')
+
+
+def validate_currency(date: str) -> bool:
+    parts = date.split()
+    return len(parts[2]) == 3
+
+
+check_count = 1
 
 
 def check_data(filepath: str, validators: Iterable[Callable]) -> str:
-    ...
+    global check_count
+    report_name = f"report_{check_count}.txt"
+    check_count = check_count + 1
+    with open(filepath) as file_under_test, open(report_name, "w") as report_file:
+        for file_line in file_under_test:
+            file_line = file_line.strip()
+
+            # run validation
+            for validator in validators:
+                is_valid = validator(file_line)
+                if not is_valid:
+                    report_file.write(f"{file_line} {validator.__name__}\n")
+                    break
+        report_file.flush()
+    return os.path.abspath(report_name)

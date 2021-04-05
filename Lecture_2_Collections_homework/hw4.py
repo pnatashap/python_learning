@@ -14,4 +14,13 @@ from collections.abc import Callable
 
 
 def cache(func: Callable) -> Callable:
-    ...
+    result_cache = dict()
+
+    def cached_func(*args) -> Callable:
+        if args in result_cache:
+            return result_cache[args]
+        result = func(*args)
+        result_cache[args] = result
+        return result
+
+    return cached_func

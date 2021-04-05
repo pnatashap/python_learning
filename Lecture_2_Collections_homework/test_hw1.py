@@ -2,7 +2,7 @@ import os
 from tempfile import NamedTemporaryFile
 
 import pytest
-from hw1 import check_data, validate_date, validate_line
+from hw1 import check_data, validate_date, validate_line, validate_mail
 
 data = [
     "baz@example.com 729.83 USD accountName 2021-01-02",
@@ -19,14 +19,15 @@ data = [
 
 @pytest.fixture
 def file_path():
-    tp = NamedTemporaryFile(mode="a")
+    tp = NamedTemporaryFile(mode="a", delete=False)
     for line in data:
         tp.write(line + "\n")
         tp.flush()
 
-    yield tp.name
     tp.close()
-    os.remove(os.path.abspath("result.txt"))
+    yield tp.name
+    os.remove(tp.name)  # судя по документации работать можно только так
+    # os.remove(os.path.abspath("result.txt")) я не знаю, что это за файл, у меня такого нет
 
 
 def test_hw1(file_path):
@@ -39,7 +40,7 @@ def test_hw1(file_path):
 
 
 def test_real_file():
-    result_path = check_data("data.txt", [validate_date, validate_line])
+    result_path = check_data("data.txt", [validate_date, validate_line, validate_mail])
     with open(result_path) as res:
         for i, _ in enumerate(res, start=1):
             pass
