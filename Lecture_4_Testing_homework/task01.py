@@ -5,7 +5,7 @@ def continued_fraction(n1: int, n2: int) -> List[int]:
     if n1 == 0:
         return [0]
     if n2 == 0:
-        return [None]
+        raise ZeroDivisionError(f"Wrong fraction {n1}/{n2}")
 
     res = []
     rest = n1 % n2
