@@ -53,6 +53,67 @@ import datetime
 from collections import defaultdict
 
 
+class DeadlineError(Exception):
+    pass
+
+
+class Pearson:
+    def __init__(self, first_name: str, last_name: str):
+        self.first_name = first_name
+        self.last_name = last_name
+
+
+class Homework:
+    def __init__(self, text: str, deadline: int):
+        self.text = text
+        self.created = datetime.datetime.now()
+        self.deadline = datetime.timedelta(deadline)
+
+    def is_active(self):
+        return datetime.datetime.now() < self.created + self.deadline
+
+
+class HomeworkResult:
+    def __init__(self, author: Pearson, homework: Homework, solution: str):
+        if not isinstance(homework, Homework):
+            raise TypeError("You gave a not Homework object")
+
+        self.homework = homework
+        self.solution = solution
+        self.author = author
+        self.created = datetime.datetime.now()
+
+
+class Teacher(Pearson):
+    homework_done = defaultdict(set)
+
+    @staticmethod
+    def create_homework(task, deadline) -> Homework:
+        return Homework(task, deadline)
+
+    def check_homework(self, homework_result: HomeworkResult) -> bool:
+        if len(homework_result.solution) > 5:
+            self.homework_done[homework_result.homework].add(homework_result)
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def reset_results(homework: Homework = None):
+        if homework is not None:
+            Teacher.homework_done[homework] = set()
+        else:
+            Teacher.homework_done = defaultdict(set)
+
+
+class Student(Pearson):
+    def do_homework(self, hw: Homework, solution) -> Homework:
+        if hw.is_active():
+            return HomeworkResult(self, hw, solution)
+        else:
+            raise DeadlineError("You are late")
+
+
 if __name__ == '__main__':
     opp_teacher = Teacher('Daniil', 'Shadrin')
     advanced_python_teacher = Teacher('Aleksandr', 'Smetanin')
